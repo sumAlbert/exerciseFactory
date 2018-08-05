@@ -14,30 +14,27 @@ const outputFn = () => {
 
     const xNewArr = xArr.filter((v) => (v !== 1));
     const oneNum = xArr.length - xNewArr.length;
-    const xNewArrIdx = [...xNewArr].map(v => parseInt(v));
+    const xNewArrIdx = [...xNewArr.keys()].map(v => parseInt(v));
 
     const DFShelper = [];
     const DFSresult = {}; 
     let DFSsum = 0;
-    let DFSplus = 0;
+    let DFSplus = 1;
     const DFS = () => {
       const diff = DFSplus - DFSsum;
-      DFSplus = DFSplus === 0 ? 1 : DFSplus;
       if (diff >= oneNum) {
         return null;
       }
-      const DFSresultKey = DFShelper.join(',');
-      if (DFSresultKey !== '') {
-        DFSresult[DFSresultKey] = Math.max(diff + 1, 0);
-      }
+      const DFSresultKey = DFShelper.join('');
+      DFSresult[DFSresultKey] = Math.max(diff + 1, 0);
 
-      xNewArrIdx.forEach((v, i) => {
-        const vIdx = DFShelper.indexOf(i);
-        if (vIdx === -1) {
+      xNewArrIdx.forEach((v) => {
+        const vIdx = DFShelper.indexOf(v);
+        if (vIdx !== -1) {
           DFSsum += v;
           DFSplus *= v;
           
-          DFShelper.push(i);
+          DFShelper.push(v);
           DFS();
           DFShelper.pop();
           
@@ -48,18 +45,12 @@ const outputFn = () => {
     }
     DFS();
 
-    const DFSMidResult = Object.entries(DFSresult).reduce((prev, curr) => {
-      const currStr = curr[0].split(',').map(v => xNewArr[v]).sort().join(',');
-      prev[currStr] = curr[1];
-      return prev;
-    }, {});
-
-    DFSresultArr = Object.entries(DFSMidResult);
+    DFSresultArr = Object.entries(DFSresult);
     const midResult = DFSresultArr.reduce((prev, curr) => {
       const result = prev + oneNum - curr[1] + 1;
       return result;
     }, 0);
-    const result = midResult + oneNum - 1;
+    const result = midResult + oneNum;
     print(result);
   }
 }
