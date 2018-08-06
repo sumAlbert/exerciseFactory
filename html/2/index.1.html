@@ -1,0 +1,20 @@
+<html>
+  <head>
+    <title></title>
+    <style>
+    </style>
+  </head>
+  <body>
+    1
+    <iframe id="iframe" src="./index.html"></iframe>
+  </body>
+  <script>
+    const iframe = document.getElementById('iframe');
+
+    window.onhashchange = (data) => {
+      console.log(111, window.location.href);
+      // 跨域
+      iframe.src = iframe.src + '#wer'
+    }
+  </script>
+</html>

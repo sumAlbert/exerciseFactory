@@ -1,0 +1,26 @@
+<html>
+  <head>
+    <title></title>
+    <style>
+    </style>
+  </head>
+  <body>
+    0
+    <iframe id="iframe1" src="./index.1.html"></iframe>
+  </body>
+  <script>
+    const iframe1 = document.getElementById('iframe1');
+    
+    setTimeout(() => {
+      iframe1.src = iframe1.src + '#123';
+    }, 1000);
+
+    cb = function(data) {
+      console.log(222, data);
+    }
+
+    window.onhashchange = (data) => {
+      window.parent.parent.cb(data);
+    }
+  </script>
+</html>
