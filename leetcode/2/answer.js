@@ -1,57 +1,61 @@
 const { smallCharacter } = require('../../lib/tool');
 
 /**
- * @param {string} beginWord
- * @param {string} endWord
- * @param {string[]} wordList
- * @return {number}
+ * @param {number[][]} matrix
+ * @return {number[][]}
  */
-var ladderLength = function (beginWord, endWord, wordList) {
-  let result = 0;
-  const smallCharacter = 'abcdefghijklmnopqrstuvwxyz';
-  const smallArr = smallCharacter.split('');
-  const beginEl = beginWord.split('');
-  beginEl.step = 0;
-  const wordHashMap = wordList.reduce((prev, curr) => {
-    prev[curr] = true;
-    return prev;
-  }, {});
-  const BFSOldQue = {};
-  const BFSque = [beginEl]
+var updateMatrix = function (matrix) {
+  const BFSque = [];
+  const n = matrix.length;
+  const m = (matrix[0] || []).length;
+  const resultArr = matrix.map((vo, io) => {
+    const midMap = vo.map((vi, ii) => {
+      if (parseInt(vi) === 0) {
+        const currEl = [io, ii];
+        currEl.step = 0;
+        BFSque.push(currEl);
+        return 0;
+      } else {
+        return Infinity;
+      }
+    })
+    return midMap;
+  })
   while (BFSque.length !== 0) {
     const currEl = BFSque.shift();
-    const currStr = currEl.join('');
     const currStep = currEl.step;
-    if (currStr === endWord) {
-      result = currStep + 1;
-      break;
-    }
-    if (BFSOldQue[currStr]) {
-      continue;
-    }
-    BFSOldQue[currStr] = true;
-    currEl.forEach((vo, io, ao) => {
-      smallArr.forEach((vi) => {
-        if (vo !== vi) {
-          const newArr = [].concat(ao);
-          newArr.step = currStep + 1;
-          newArr[io] = vi;
-          const newStr = newArr.join('');
-          if (wordHashMap[newStr]) {
-            BFSque.push(newArr);
-          }
-        }
-      })
+    const curri = parseInt(currEl[0]);
+    const currj = parseInt(currEl[1]);
+    const currVal = resultArr[curri][currj];
+    const nextVals = [];
+    const nextDiffs = [[-1, 0], [1, 0], [0, -1], [0, 1]];
+    nextDiffs.forEach(v => {
+      const diffI = v[0];
+      const diffJ = v[1];
+      let nextVal = ((resultArr[curri + diffI]) || [])[currj + diffJ];
+      if(nextVal === Infinity) {
+        const nextEl = [curri + diffI, currj + diffJ];
+        nextEl.step = currStep + 1;
+        BFSque.push(nextEl);
+      } else if(nextVal === undefined) {
+        nextVal = Infinity
+      }
+      nextVals.push(nextVal);
     })
-  };
-  return result;
+    const min = nextVals.reduce((prev, curr) => {
+      return Math.min(prev, curr);
+    });
+    if(currVal === Infinity) {
+      currVal = min + 1;
+    }
+  }
+  debugger;
 };
 
 
 
-
 // 输出模块
-const outputFn = ladderLength; // 记得修改这个！！！！
+const outputFn = updateMatrix; // 记得修改这个！！！！
 module.exports = (data) => {
   console.log('运行前输入的参数', data);
   const result = outputFn.apply(this, data);

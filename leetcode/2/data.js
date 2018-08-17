@@ -1,10 +1,7 @@
 const { toCharacter } = require('../../lib/platform');
-beginWord = "hit",
-endWord = "cog",
-wordList = ["hot","dot","dog","lot","log","cog"]
 
-module.exports = [
-  beginWord,
-  endWord,
-  wordList
-];
+module.exports = [toCharacter(`
+0 0 0
+0 1 0
+1 1 1
+`)];
