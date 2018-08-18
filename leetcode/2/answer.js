@@ -2,63 +2,81 @@ const { smallCharacter } = require('../../lib/tool');
 
 /**
  * @param {number[][]} matrix
- * @return {number[][]}
+ * @return {number}
  */
-var updateMatrix = function (matrix) {
-  const BFSque = [];
-  const n = matrix.length;
-  const m = (matrix[0] || []).length;
-  const resultArr = matrix.map((vo, io) => {
-    const midMap = vo.map((vi, ii) => {
-      if (parseInt(vi) === 0) {
-        const currEl = [io, ii];
-        currEl.step = 0;
-        BFSque.push(currEl);
-        return 0;
-      } else {
-        return Infinity;
+var longestIncreasingPath = function (matrix) {
+  let DFSStack = [];
+  let DFSMap = {};
+  const DFSHelper = [];
+  const write2DFSHelper = (row, column, val) => {
+    const currRow = DFSHelper[row] || [];
+    currRow[column] = val;
+    DFSHelper[row] = currRow;
+  };
+  const recursive = () => {
+    const currPoint = DFSStack[DFSStack.length - 1];
+    const [currI, currJ] = currPoint;
+    const currVal = matrix[currI][currJ];
+    const nextDirc = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+    let nextNum = 0;
+    let cbValMax = 0;
+    nextDirc.forEach(dirc => {
+      const nextI = currI + dirc[0];
+      const nextJ = currJ + dirc[1];
+      const nextEl = (matrix[nextI] || [])[nextJ];
+      if (nextEl !== undefined && nextEl > currVal && !DFSMap[`${nextI},${nextJ}`]) {
+        nextNum++;
+        DFSStack.push([nextI, nextJ]);
+        DFSMap[`${nextI},${nextJ}`] = true;
+        const DFSHelperVal = (DFSHelper[nextI] || [])[nextJ];
+        if (DFSHelperVal === undefined) {
+          const cbVal = recursive();
+          cbValMax = Math.max(cbVal + 1, cbValMax);
+        } else {
+          cbValMax = Math.max(parseInt(DFSHelperVal) + 1, cbValMax);
+        }
+        DFSStack.pop();
+        DFSMap[`${nextI},${nextJ}`] = false;
       }
-    })
-    return midMap;
-  })
-  while (BFSque.length !== 0) {
-    const currEl = BFSque.shift();
-    const currStep = currEl.step;
-    const curri = parseInt(currEl[0]);
-    const currj = parseInt(currEl[1]);
-    const currVal = resultArr[curri][currj];
-    const nextVals = [];
-    const nextDiffs = [[-1, 0], [1, 0], [0, -1], [0, 1]];
-    nextDiffs.forEach(v => {
-      const diffI = v[0];
-      const diffJ = v[1];
-      let nextVal = ((resultArr[curri + diffI]) || [])[currj + diffJ];
-      if(nextVal === Infinity) {
-        const nextEl = [curri + diffI, currj + diffJ];
-        nextEl.step = currStep + 1;
-        BFSque.push(nextEl);
-      } else if(nextVal === undefined) {
-        nextVal = Infinity
-      }
-      nextVals.push(nextVal);
-    })
-    const min = nextVals.reduce((prev, curr) => {
-      return Math.min(prev, curr);
     });
-    if(currVal === Infinity) {
-      currVal = min + 1;
+    if (nextNum === 0) {
+      write2DFSHelper(currI, currJ, 1);
+      return 1;
     }
+    write2DFSHelper(currI, currJ, cbValMax);
+    return cbValMax;
   }
-  debugger;
+
+  matrix.forEach((row, rowIdx) => {
+    row.forEach((column, columnIdx) => {
+      const DFSHelperVal = (DFSHelper[rowIdx] || [])[columnIdx];
+      if (DFSHelperVal === undefined) {
+        DFSMap = {};
+        DFSStack = [[rowIdx, columnIdx]];
+        DFSMap[`${rowIdx},${columnIdx}`] = true;
+        recursive();
+      }
+    })
+  })
+
+  const result = DFSHelper.reduce((prev, curr) => {
+    prev = curr.reduce((midPrev, midCurr) => {
+      midPrev = Math.max(midPrev, midCurr);
+      return midPrev;
+    }, prev);
+    return prev;
+  }, 0);
+  return result;
 };
 
 
 
 // 输出模块
-const outputFn = updateMatrix; // 记得修改这个！！！！
+const outputFn = longestIncreasingPath; // 记得修改这个！！！！
 module.exports = (data) => {
   console.log('运行前输入的参数', data);
   const result = outputFn.apply(this, data);
+  console.log('返回值', result);
   console.log('运行后输入的参数', data);
   debugger
   return result;
