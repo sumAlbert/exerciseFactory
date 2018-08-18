@@ -1,7 +1,7 @@
 const kinds = ['niuke', 'normal', 'leetcode'];
 const config = {
-  kindNum: 2,
-  questionNum: 2,
+  kindNum: 0,
+  questionNum: 18,
 }
 try {
   const app = require(`./${kinds[config.kindNum]}/${config.questionNum}/index`);
