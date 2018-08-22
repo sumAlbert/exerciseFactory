@@ -1,51 +1,45 @@
 //read_line() 赛码网
 //readline() 牛客网
 const { read_line, readline, print } = require('../../lib/platform');
+const { smallCharacter } = require('../../lib/tool');
 const outputFn = () => {
   // code
+  const smallCharacter = 'abcdefghijklmnopqrstuvwxyz';
+  const dictArr = smallCharacter.split('').reverse();
   let currentLine = null;
   while (currentLine = readline()) {
-    const sourceArr = currentLine.split('');
-    const targetArr = readline().split('');
-
-    if (targetArr && targetArr.length === 0 || sourceArr && sourceArr.length === 0) {
-      print('No'); continue;
-    }
-    const dictMap = sourceArr.reduce((prev, curr, index) => {
-      if (!prev[curr]) {
-        prev[curr] = [index];
-      } else {
-        prev[curr].push(index);
-      }
+    const targetArr = currentLine.split('');
+    const dictList = targetArr.reduce((prev, curr, idx) => {
+      const currList = prev[curr] || [];
+      currList.push(idx);
+      prev[curr] = currList;
       return prev;
     }, {});
-
-    const resultQueue = (dictMap[targetArr[0]] || []).map((val) => ([val]));
-    if (resultQueue.length !== 0 && targetArr.length === 1) {
-      print('Yes');
-      continue;
-    }
-    let findFlag = false;
-    while ((resultQueue || []).length !== 0) {
-      const currArr = resultQueue.shift();
-      const index = currArr.length;
-      const waitChar = targetArr[index];
-      if (!waitChar) continue;
-      const currWaitAddQue = dictMap[waitChar];
-      const cmpNum = currArr[currArr.length - 1]; 
-      (currWaitAddQue || []).forEach((val) => {
-        if (parseInt(val) > parseInt(cmpNum)) {
-          const waitPushArr = currArr.concat([val]);
-          resultQueue.push(waitPushArr);
-          findFlag = findFlag || waitPushArr.length === targetArr.length
+    const orderList = dictArr.reduce((prev, curr) => {
+      const currList = [].concat(dictList[curr] || []);
+      currList.character = curr;
+      prev.push(currList);
+      return prev;
+    }, []);
+    const resultObj = orderList.reduce((prev, curr) => {
+      const lastIdx = prev.lastIdx;
+      const lastArr = prev.lastArr;
+      const currChar = curr.character;
+      curr.reduce((midPrev, midCurr) => {
+        if(midCurr > lastIdx) {
+          lastArr.push(currChar);
+          prev.lastIdx = midCurr;
+          return midCurr;
         }
-      });
-    }
-    if (findFlag) {
-      print('Yes');
-    } else {
-      print('No');
-    }
+        return midPrev;
+      }, lastIdx);
+      return prev;
+    }, {
+      lastIdx: -1,
+      lastArr: []
+    });
+    const result = resultObj.lastArr.join('');
+    print(result);
   }
 }
 
