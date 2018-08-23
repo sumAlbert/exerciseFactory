@@ -4,42 +4,42 @@ const { read_line, readline, print } = require('../../lib/platform');
 const { smallCharacter } = require('../../lib/tool');
 const outputFn = () => {
   // code
-  const smallCharacter = 'abcdefghijklmnopqrstuvwxyz';
-  const dictArr = smallCharacter.split('').reverse();
+  const C = (n, m) => {
+    const upperNum = [...new Array(m).keys()].map(v => v + n - m + 1).reduce((prev, curr) => (prev * curr), 1);
+    const bottomNum = [...new Array(m).keys()].map(v => v + 1).reduce((prev, curr) => (prev * curr), 1);
+    return upperNum / bottomNum;
+  }
   let currentLine = null;
   while (currentLine = readline()) {
-    const targetArr = currentLine.split('');
-    const dictList = targetArr.reduce((prev, curr, idx) => {
-      const currList = prev[curr] || [];
-      currList.push(idx);
-      prev[curr] = currList;
-      return prev;
-    }, {});
-    const orderList = dictArr.reduce((prev, curr) => {
-      const currList = [].concat(dictList[curr] || []);
-      currList.character = curr;
-      prev.push(currList);
-      return prev;
-    }, []);
-    const resultObj = orderList.reduce((prev, curr) => {
-      const lastIdx = prev.lastIdx;
-      const lastArr = prev.lastArr;
-      const currChar = curr.character;
-      curr.reduce((midPrev, midCurr) => {
-        if(midCurr > lastIdx) {
-          lastArr.push(currChar);
-          prev.lastIdx = midCurr;
-          return midCurr;
-        }
-        return midPrev;
-      }, lastIdx);
-      return prev;
-    }, {
-      lastIdx: -1,
-      lastArr: []
-    });
-    const result = resultObj.lastArr.join('');
-    print(result);
+    let [n, m, k] = currentLine.split(' ').map(v => parseInt(v));
+    let lastChar;
+    const totalLen = n + m;
+    const resultQue = [];
+    while (resultQue.length < totalLen && n !== 0 && m !== 0) {
+      const totalNum = n + m - 1;
+      const aNum = n - 1;
+      const cmpNum = C(totalNum, aNum);
+      if (k > cmpNum) {
+        resultQue.push('z');
+        k -= cmpNum;
+        m--;
+      } else {
+        resultQue.push('a');
+        n--;
+      }
+    }
+    if (n === 0) {
+      lastChar = 'z';
+    } else {
+      lastChar = 'a';
+    }
+    while (resultQue.length < totalLen) {
+      resultQue.push(lastChar);
+    }
+    if (k === 1)
+      print(resultQue.join(''));
+    else
+      print(-1);
   }
 }
 
