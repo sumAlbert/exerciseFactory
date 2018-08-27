@@ -4,43 +4,41 @@ const { read_line, readline, print } = require('../../lib/platform');
 const { smallCharacter } = require('../../lib/tool');
 const outputFn = () => {
   // code
-  const C = (n, m) => {
-    const upperNum = [...new Array(m).keys()].map(v => v + n - m + 1).reduce((prev, curr) => (prev * curr), 1);
-    const bottomNum = [...new Array(m).keys()].map(v => v + 1).reduce((prev, curr) => (prev * curr), 1);
-    return upperNum / bottomNum;
-  }
-  let currentLine = null;
-  while (currentLine = readline()) {
-    let [n, m, k] = currentLine.split(' ').map(v => parseInt(v));
-    let lastChar;
-    const totalLen = n + m;
-    const resultQue = [];
-    while (resultQue.length < totalLen && n !== 0 && m !== 0) {
-      const totalNum = n + m - 1;
-      const aNum = n - 1;
-      const cmpNum = C(totalNum, aNum);
-      if (k > cmpNum) {
-        resultQue.push('z');
-        k -= cmpNum;
-        m--;
+  const read = (arr, idxs = [], emptyVal = undefined) => {
+    const MAXDEEP = idxs.length - 1;
+    if(idxs.length === 0) {
+      return arr;
+    }
+    const level = idxs.reduce((prev, curr, idx) => {
+      if(idx !== MAXDEEP) {
+        prev = prev[curr] || [];
       } else {
-        resultQue.push('a');
-        n--;
+        lastIdx = curr;
       }
-    }
-    if (n === 0) {
-      lastChar = 'z';
-    } else {
-      lastChar = 'a';
-    }
-    while (resultQue.length < totalLen) {
-      resultQue.push(lastChar);
-    }
-    if (k === 1)
-      print(resultQue.join(''));
-    else
-      print(-1);
+      return prev;
+    }, arr);
+    return level[lastIdx] === undefined ? emptyVal: level[lastIdx];
   }
+
+  const write = (arr, idxs = [], val) => {
+    let currLev = arr, idx, i;
+    if (idxs.length === 0) {
+      return;
+    }
+    for (i = 0; i < idxs.length - 1; i++) {
+      idx = idxs[i];
+      if (currLev[idx] === undefined) {
+        currLev[idx] = [];
+      }
+      currLev = currLev[idx];
+    }
+    idx = idxs[i];
+    currLev[idx] = val; 
+  }
+
+  const a = [];
+  write(a, [1, 2], 'test');
+  console.log(a);
 }
 
 module.exports = () => {
